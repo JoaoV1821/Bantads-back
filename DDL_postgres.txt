@@ -1,0 +1,119 @@
+CREATE DATABASE CONTAS_CUD;
+
+\connect contas_cud;
+
+CREATE TABLE Cliente 
+( 
+ CPF CHAR(11) PRIMARY KEY,  
+ Nome VARCHAR(100) NOT NULL  
+); 
+
+CREATE TABLE Gerente 
+( 
+ CPF CHAR(11) PRIMARY KEY,  
+ Nome VARCHAR(100) NOT NULL
+); 
+
+CREATE TABLE Conta 
+( 
+ NumeroConta SERIAL PRIMARY KEY,  
+ DataCriacao DATE NOT NULL,  
+ Limite NUMERIC(15,2) NOT NULL,  
+ Cliente CHAR(11) NOT NULL UNIQUE REFERENCES Cliente (CPF),  
+ Gerente CHAR(11) NOT NULL REFERENCES Gerente (CPF)
+); 
+
+CREATE TABLE TipoMovimentacao 
+( 
+ Id SERIAL PRIMARY KEY,  
+ Descricao VARCHAR(50) NOT NULL UNIQUE
+); 
+
+CREATE TABLE HistoricoMovimentacoes 
+( 
+ Data DATE NOT NULL,  
+ ClienteDestino CHAR(11) REFERENCES Cliente (CPF),  
+ ValorMovimentado NUMERIC(15,2) NOT NULL,  
+ Tipo INT NOT NULL REFERENCES TipoMovimentacao (Id),
+ NumeroConta INT REFERENCES Conta (NumeroConta)
+); 
+
+CREATE DATABASE CONTAS_R;
+
+\connect contas_r;
+
+CREATE TABLE Conta 
+( 
+ NumeroConta INT PRIMARY KEY,  
+ DataCriacao DATE NOT NULL,  
+ Limite NUMERIC(15,2) NOT NULL,  
+ ClienteCPF CHAR(11) NOT NULL UNIQUE,  
+ ClienteNome VARCHAR(100) NOT NULL,  
+ GerenteCPF CHAR(11) NOT NULL,  
+ GerenteNome VARCHAR(100) NOT NULL
+); 
+
+CREATE TABLE HistoricoMovimentacoes 
+( 
+ Data DATE NOT NULL,  
+ ValorMovimentado NUMERIC(15,2) NOT NULL,  
+ TipoId INT NOT NULL,  
+ TipoDescricao VARCHAR(50) NOT NULL,  
+ CPFClienteDestino CHAR(11),  
+ NomeClienteDestino VARCHAR(100),  
+ Conta INT NOT NULL REFERENCES Conta (NumeroConta)  
+); 
+
+CREATE DATABASE CLIENTE;
+
+\connect cliente;
+
+CREATE TABLE Cliente 
+( 
+ CPF CHAR(11) PRIMARY KEY,  
+ Nome VARCHAR(100) NOT NULL,  
+ Email VARCHAR(100) NOT NULL UNIQUE,  
+ Telefone CHAR(11) NOT NULL UNIQUE,  
+ Salario NUMERIC(15,2) NOT NULL 
+); 
+
+CREATE TABLE Estado 
+( 
+ Id SERIAL PRIMARY KEY,  
+ Nome VARCHAR(50) NOT NULL UNIQUE,  
+ Sigla CHAR(2) NOT NULL UNIQUE,  
+ CONSTRAINT uq_Nome_sigla UNIQUE (Nome,Sigla)
+); 
+
+CREATE TABLE Cidade 
+( 
+ Id SERIAL PRIMARY KEY,  
+ Nome VARCHAR(100) NOT NULL,  
+ Estado INT NOT NULL REFERENCES Estado (Id)
+); 
+
+
+CREATE TABLE Endereco 
+( 
+ Tipo VARCHAR(50) NOT NULL,  
+ Logradouro VARCHAR(100) NOT NULL,  
+ Numero INT,  
+ Complemento VARCHAR(100),  
+ CEP CHAR(7) NOT NULL,  
+ Cidade INT NOT NULL REFERENCES Cidade (Id),  
+ Estado INT NOT NULL REFERENCES Estado (Id),  
+ Cliente CHAR(11) NOT NULL UNIQUE REFERENCES Cliente (CPF)
+); 
+
+CREATE DATABASE GERENTE;
+
+\connect gerente;
+
+CREATE TABLE Gerente 
+( 
+ CPF CHAR(11) PRIMARY KEY,  
+ Nome VARCHAR(100) NOT NULL,  
+ Email VARCHAR(100) NOT NULL UNIQUE,  
+ Telefone VARCHAR(11) NOT NULL UNIQUE
+); 
+
